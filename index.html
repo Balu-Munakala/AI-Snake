@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta name="theme-color" content="#101417" />
+
+  <title>Snake AI</title>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <main class="app-shell" aria-labelledby="game-title">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="topbar">
+
+      <div>
+        <p class="eyebrow">
+          AI ARCADE / 01
+        </p>
+
+        <h1 id="game-title">
+          Snake AI
+        </h1>
+      </div>
+
+      <div class="scores" aria-label="Game scores">
+
+        <div class="score-card">
+          <span>Score</span>
+          <strong id="score" aria-live="polite">
+            0
+          </strong>
+        </div>
+
+        <div class="score-card">
+          <span>Best</span>
+          <strong id="high-score">
+            0
+          </strong>
+        </div>
+
+      </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         START / STATS PANEL
+    ====================================================== -->
+
+    <section id="start-panel" class="start-panel" aria-label="Snake AI start screen">
+
+      <div class="start-content">
+
+        <p class="panel-label">
+          AUTONOMOUS SNAKE
+        </p>
+
+        <h2>
+          Hamiltonian AI
+        </h2>
+
+        <p class="start-description">
+          Watch the AI navigate the entire board
+          using a Hamiltonian cycle.
+        </p>
+
+
+        <!-- Quick statistics -->
+
+        <div class="quick-stats" aria-label="Game statistics">
+
+          <div class="quick-stat">
+            <span>Games</span>
+            <strong id="start-games">
+              0
+            </strong>
+          </div>
+
+          <div class="quick-stat">
+            <span>Best Score</span>
+            <strong id="start-best-score">
+              0
+            </strong>
+          </div>
+
+          <div class="quick-stat">
+            <span>Win Rate</span>
+            <strong id="start-win-rate">
+              0%
+            </strong>
+          </div>
+
+        </div>
+
+
+        <div class="start-actions">
+
+          <button id="start-ai-button" class="primary-button" type="button">
+            Start AI
+          </button>
+
+          <button id="view-stats-button" type="button">
+            View Stats
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         GAME SCREEN
+    ====================================================== -->
+
+    <section id="game-screen" class="game-screen is-hidden" aria-label="Snake game">
+
+      <section class="game-area">
+
+        <div class="canvas-wrap">
+
+          <canvas id="game-canvas" role="img" aria-label="Snake game board" tabindex="0">
+            Your browser does not support
+            the Canvas element.
+          </canvas>
+
+          <div id="game-message" class="game-message" aria-live="assertive" aria-atomic="true">
+
+            <p id="message-title">
+              Ready?
+            </p>
+
+            <p id="message-detail">
+              The Hamiltonian AI will
+              play automatically.
+            </p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+             LIVE GAME INFORMATION
+        ================================================== -->
+
+      <section class="live-stats" aria-label="Live game statistics">
+
+        <div class="live-stat">
+          <span>Game</span>
+          <strong id="live-game-number">
+            0
+          </strong>
+        </div>
+
+        <div class="live-stat">
+          <span>Score</span>
+          <strong id="live-score">
+            0
+          </strong>
+        </div>
+
+        <div class="live-stat">
+          <span>Length</span>
+          <strong id="live-length">
+            0
+          </strong>
+        </div>
+
+        <div class="live-stat">
+          <span>Time</span>
+          <strong id="live-time">
+            0s
+          </strong>
+        </div>
+
+      </section>
+
+      <section class="ai-decision-panel" aria-label="AI decision information">
+
+        <div class="ai-decision-header">
+          <span class="panel-label">AI DECISION</span>
+          <select id="ai-strategy-select">
+          <option value="hamiltonian">
+              Hamiltonian
+          </option>
+
+          <option value="bfs">
+              BFS
+          </option>
+
+          <option value="safe-bfs">
+              Safe BFS
+          </option>
+      </select>
+        </div>
+
+        <div class="ai-decision-grid">
+
+          <div class="ai-decision-item">
+            <span>Head</span>
+            <strong id="ai-head">--</strong>
+          </div>
+
+          <div class="ai-decision-item">
+            <span>Food</span>
+            <strong id="ai-food">--</strong>
+          </div>
+
+          <div class="ai-decision-item">
+            <span>Current</span>
+            <strong id="ai-current-direction">--</strong>
+          </div>
+
+          <div class="ai-decision-item">
+            <span>Next</span>
+            <strong id="ai-next-direction">--</strong>
+          </div>
+
+          <div class="ai-decision-item">
+            <span>Cycle Position</span>
+            <strong id="ai-cycle-position">--</strong>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+             CONTROLS
+        ================================================== -->
+
+      <section class="controls-panel" aria-label="Game controls">
+
+        <p id="status" class="status" role="status">
+          READY
+        </p>
+
+        <div class="actions">
+
+          <button id="start-button" type="button">
+            Start AI
+          </button>
+
+          <button id="pause-button" type="button" disabled>
+            Pause
+          </button>
+
+          <button id="path-button" type="button">
+            Hide AI Path
+          </button>
+
+          <button id="back-button" type="button">
+            Back
+          </button>
+
+        </div>
+
+        <p class="help">
+
+          <kbd>↑</kbd>
+          <kbd>↓</kbd>
+          <kbd>←</kbd>
+          <kbd>→</kbd>
+
+          or
+
+          <kbd>W</kbd>
+          <kbd>A</kbd>
+          <kbd>S</kbd>
+          <kbd>D</kbd>
+
+          to move ·
+
+          <kbd>Space</kbd>
+          pause ·
+
+          <kbd>Enter</kbd>/<kbd>R</kbd>
+          restart
+
+        </p>
+
+      </section>
+
+    </section>
+
+
+    <!-- =====================================================
+         STATISTICS SCREEN
+    ====================================================== -->
+
+    <section id="stats-screen" class="stats-screen is-hidden" aria-label="Snake AI statistics">
+
+      <div class="stats-header">
+
+        <div>
+
+          <p class="panel-label">
+            PERFORMANCE
+          </p>
+
+          <h2>
+            AI Statistics
+          </h2>
+
+        </div>
+
+        <button id="stats-back-button" type="button">
+          Back
+        </button>
+
+      </div>
+
+
+      <div class="stats-grid">
+
+        <div class="stat-card">
+          <span>Games Played</span>
+          <strong id="stats-games-played">
+            0
+          </strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Games Won</span>
+          <strong id="stats-games-won">
+            0
+          </strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Games Lost</span>
+          <strong id="stats-games-lost">
+            0
+          </strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Win Rate</span>
+          <strong id="stats-win-rate">
+            0%
+          </strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Current Score</span>
+          <strong id="stats-current-score">
+            0
+          </strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Best Score</span>
+          <strong id="stats-best-score">
+            0
+          </strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Current Length</span>
+          <strong id="stats-current-length">
+            0
+          </strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Best Length</span>
+          <strong id="stats-best-length">
+            0
+          </strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Food Eaten</span>
+          <strong id="stats-food-eaten">
+            0
+          </strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Current Time</span>
+          <strong id="stats-current-time">
+            0s
+          </strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Total Play Time</span>
+          <strong id="stats-total-time">
+            0s
+          </strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Best Game Time</span>
+          <strong id="stats-best-time">
+            0s
+          </strong>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <noscript>
+      <p class="noscript">
+        Snake AI needs JavaScript enabled.
+      </p>
+    </noscript>
+
+  </main>
+
+
+  <!-- =========================================================
+                        SCRIPTS
+  ========================================================== -->
+
+  <script src="ai/core/gridUtils.js"></script>
+  <script src="ai/core/aiInterface.js"></script>
+  
+  <script src="ai/hamiltonianAI.js"></script>
+  <script src="ai/bfsAI.js"></script>
+  <script src="ai/safeBfsAI.js"></script>
+  
+  <script src="ai/core/aiRegistry.js"></script>
+  
+  <script src="game/snakeEnvironment.js"></script>
+  <script src="game/gameManager.js"></script>
+  <script src="game/game.js"></script>
+
+</body>
+
+</html>
