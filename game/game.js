@@ -222,38 +222,38 @@
         );
     }
 
-    function isOccupied(cell) {
-        return game.snake.some(segment =>
-            sameCell(segment, cell)
-        );
-    }
+    // function isOccupied(cell) {
+    //     return game.snake.some(segment =>
+    //         sameCell(segment, cell)
+    //     );
+    // }
 
 
     /* =========================================================
        FOOD
     ========================================================= */
 
-    function createFood() {
-        const freeCells = [];
+    // function createFood() {
+    //     const freeCells = [];
 
-        for (let y = 0; y < GRID_SIZE; y++) {
-            for (let x = 0; x < GRID_SIZE; x++) {
-                const cell = { x, y };
+    //     for (let y = 0; y < GRID_SIZE; y++) {
+    //         for (let x = 0; x < GRID_SIZE; x++) {
+    //             const cell = { x, y };
 
-                if (!isOccupied(cell)) {
-                    freeCells.push(cell);
-                }
-            }
-        }
+    //             if (!isOccupied(cell)) {
+    //                 freeCells.push(cell);
+    //             }
+    //         }
+    //     }
 
-        if (freeCells.length === 0) {
-            return null;
-        }
+    //     if (freeCells.length === 0) {
+    //         return null;
+    //     }
 
-        return freeCells[
-            Math.floor(Math.random() * freeCells.length)
-        ];
-    }
+    //     return freeCells[
+    //         Math.floor(Math.random() * freeCells.length)
+    //     ];
+    // }
 
 
     /* =========================================================
@@ -328,7 +328,6 @@
 
         if (
             game.ai &&
-            game.aiStrategy === "bfs" &&
             typeof game.ai.reset === "function"
         ) {
             game.ai.reset();
@@ -533,95 +532,152 @@
        GAME UPDATE
     ========================================================= */
 
+    // function update() {
+    //     /*
+    //      * Let AI choose the next direction.
+    //      */
+    //     updateAI();
+
+    //     /*
+    //      * Apply direction.
+    //      */
+    //     game.direction = game.pendingDirection;
+
+    //     const vector = DIRECTIONS[game.direction];
+
+    //     const nextHead = {
+    //         x: game.snake[0].x + vector.x,
+    //         y: game.snake[0].y + vector.y
+    //     };
+
+    //     /*
+    //      * Determine whether food will be eaten.
+    //      */
+    //     const willEat =
+    //         game.food &&
+    //         sameCell(nextHead, game.food);
+
+    //     /*
+    //      * If not eating, the tail moves away.
+    //      * Therefore the current tail is allowed.
+    //      */
+    //     const bodyToCheck = willEat
+    //         ? game.snake
+    //         : game.snake.slice(0, -1);
+
+    //     /*
+    //      * Collision detection.
+    //      */
+    //     const hitsWall = !isInsideBoard(nextHead, GRID_SIZE, GRID_SIZE);
+
+    //     const hitsBody = bodyToCheck.some(segment =>
+    //         sameCell(segment, nextHead)
+    //     );
+
+    //     if (hitsWall || hitsBody) {
+    //         endGame(false);
+    //         return;
+    //     }
+
+    //     /*
+    //      * Add new head.
+    //      */
+    //     game.snake.unshift(nextHead);
+
+    //     if (willEat) {
+    //         /*
+    //          * Food consumed.
+    //          */
+    //         game.score++;
+
+    //         game.highScore = Math.max(
+    //             game.highScore,
+    //             game.score
+    //         );
+
+    //         saveHighScore();
+
+    //         /*
+    //          * Generate next food.
+    //          */
+    //         game.food = createFood();
+
+    //         /*
+    //          * No free cells = board completely filled.
+    //          */
+    //         if (!game.food) {
+    //             endGame(true);
+    //             return;
+    //         }
+    //     } else {
+    //         /*
+    //          * Normal movement.
+    //          */
+    //         game.snake.pop();
+    //     }
+
+    //     updateUI();
+
+    //     /*
+    //      * Update GameManager statistics.
+    //      */
+    //     if (game.gameManager) {
+    //         game.gameManager.update();
+    //     }
+    // }
+
     function update() {
+
         /*
-         * Let AI choose the next direction.
-         */
+        * Let AI choose the next direction.
+        */
         updateAI();
 
         /*
-         * Apply direction.
-         */
-        game.direction = game.pendingDirection;
-
-        const vector = DIRECTIONS[game.direction];
-
-        const nextHead = {
-            x: game.snake[0].x + vector.x,
-            y: game.snake[0].y + vector.y
-        };
+        * Let the environment execute the action.
+        */
+        const result =
+            game.environment.step(
+                game.pendingDirection
+            );
 
         /*
-         * Determine whether food will be eaten.
-         */
-        const willEat =
-            game.food &&
-            sameCell(nextHead, game.food);
+        * Synchronize game controller state
+        * with environment state.
+        */
+        const state = result.state;
+
+        game.snake = state.snake;
+        game.food = state.food;
+        game.direction = state.direction;
+        game.pendingDirection = state.direction;
+        game.score = state.score;
 
         /*
-         * If not eating, the tail moves away.
-         * Therefore the current tail is allowed.
-         */
-        const bodyToCheck = willEat
-            ? game.snake
-            : game.snake.slice(0, -1);
+        * Update high score.
+        */
+        if (game.score > game.highScore) {
+            game.highScore = game.score;
+            saveHighScore();
+        }
 
         /*
-         * Collision detection.
-         */
-        const hitsWall = !isInsideBoard(nextHead, GRID_SIZE, GRID_SIZE);
-
-        const hitsBody = bodyToCheck.some(segment =>
-            sameCell(segment, nextHead)
-        );
-
-        if (hitsWall || hitsBody) {
-            endGame(false);
+        * Environment decides whether
+        * the game has ended.
+        */
+        if (result.done) {
+            endGame(result.won);
             return;
         }
 
         /*
-         * Add new head.
-         */
-        game.snake.unshift(nextHead);
-
-        if (willEat) {
-            /*
-             * Food consumed.
-             */
-            game.score++;
-
-            game.highScore = Math.max(
-                game.highScore,
-                game.score
-            );
-
-            saveHighScore();
-
-            /*
-             * Generate next food.
-             */
-            game.food = createFood();
-
-            /*
-             * No free cells = board completely filled.
-             */
-            if (!game.food) {
-                endGame(true);
-                return;
-            }
-        } else {
-            /*
-             * Normal movement.
-             */
-            game.snake.pop();
-        }
-
+        * Update UI.
+        */
         updateUI();
 
         /*
-         * Update GameManager statistics.
-         */
+        * Update GameManager statistics.
+        */
         if (game.gameManager) {
             game.gameManager.update();
         }

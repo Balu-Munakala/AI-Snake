@@ -251,37 +251,16 @@ class SnakeEnvironment {
         const freeCells = [];
 
 
-        for (
-            let y = 0;
-            y < this.height;
-            y++
-        ) {
+        for (let y = 0; y < this.height; y++) {
+            for (let x = 0; x < this.width; x++) {
 
-            for (
-                let x = 0;
-                x < this.width;
-                x++
-            ) {
+                const cell = {x, y};
 
-                const cell = {
-                    x,
-                    y
-                };
-
-
-                if (
-                    this.snake.some(
-                        segment => sameCell(segment, cell)
-                    )
-                ) {
-
-                    freeCells.push(
-                        cell
-                    );
+                if (!this.snake.some(segment => sameCell(segment, cell))) {
+                    freeCells.push(cell);
                 }
             }
         }
-
 
         if (
             freeCells.length === 0
