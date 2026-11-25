@@ -14,13 +14,12 @@
  * and works with the 20x20 board used by the game.
  */
 
-class HamiltonianAI {
-    constructor(game) {
-        if (!game) {
-            throw new Error("HamiltonianAI requires a game instance.");
+class HamiltonianAI extends AIInterface {
+    constructor(config) {
+        if (!config) {
+            throw new Error("HamiltonianAI requires a configuration object.");
         }
-
-        this.game = game;
+        super(config);
 
         this.width = 0;
         this.height = 0;
@@ -259,17 +258,17 @@ class HamiltonianAI {
      * Get the snake head.
      */
     getSnakeHead() {
-        if (!this.game.snake) {
+        if (!this.snake) {
             return null;
         }
 
         if (
-            Array.isArray(this.game.snake) &&
-            this.game.snake.length > 0
+            Array.isArray(this.snake) &&
+            this.snake.length > 0
         ) {
             return {
-                x: this.game.snake[0].x,
-                y: this.game.snake[0].y
+                x: this.snake[0].x,
+                y: this.snake[0].y
             };
         }
 
@@ -314,8 +313,8 @@ class HamiltonianAI {
      * Get board width.
      */
     getBoardWidth() {
-        if (Number.isInteger(this.game.boardWidth)) {
-            return this.game.boardWidth;
+        if (Number.isInteger(this.boardWidth)) {
+            return this.boardWidth;
         }
 
         /*
@@ -328,8 +327,8 @@ class HamiltonianAI {
      * Get board height.
      */
     getBoardHeight() {
-        if (Number.isInteger(this.game.boardHeight)) {
-            return this.game.boardHeight;
+        if (Number.isInteger(this.boardHeight)) {
+            return this.boardHeight;
         }
 
         return 20;

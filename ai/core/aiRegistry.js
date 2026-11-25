@@ -3,7 +3,8 @@
 const AI_STRATEGIES = {
     hamiltonian: HamiltonianAI,
     bfs: BFSAI,
-    "safe-bfs": SafeBFSAI
+    "safe-bfs": SafeBFSAI,
+    dfs: DFSAI
 };
 
 

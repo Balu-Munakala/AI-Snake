@@ -1247,7 +1247,7 @@
 
 
     //     ctx.stroke();
-    
+
     //     ctx.restore();
     // }
 
@@ -1258,7 +1258,6 @@
 
         bfs: () => {
             drawAiPath(
-                game.ai.getPath(),
                 {
                     strokeStyle: "rgba(255, 214, 102, 0.8)",
                     lineWidth: 2.5
@@ -1268,17 +1267,31 @@
 
         "safe-bfs": () => {
             drawAiPath(
-                game.ai.getPath(),
                 {
                     strokeStyle: "rgba(126, 255, 180, 0.9)",
                     lineWidth: 3
                 }
             );
+        },
+
+        dfs: () => {
+            drawAiPath(
+                {
+                    strokeStyle: "rgba(255, 126, 126, 0.9)",
+                    lineWidth: 3
+                }
+            );
         }
     };
-    
-    function drawAiPath(path, style) {
-        if (!path || path.length < 2) {
+
+    function drawAiPath(style) {
+        if (!game.ai || typeof game.ai.getPath !== "function") {
+            return;
+        }
+
+        const path = game.ai.getPath();
+
+        if (!Array.isArray(path) || path.length < 2) {
             return;
         }
 
@@ -1309,6 +1322,8 @@
 
         ctx.restore();
     }
+
+
 
 
     function drawCell(cell, insetFactor) {
@@ -1634,71 +1649,58 @@
         }
     );
 
-    ui.aiStrategySelect.addEventListener(
-        "change",
-        () => {
-            const strategy =
-                ui.aiStrategySelect.value;
+    ui.aiStrategySelect.addEventListener("change", () => {
+        const strategy = ui.aiStrategySelect.value;
 
-            // if (
-            //     game.state === STATE.RUNNING ||
-            //     game.state === STATE.PAUSED
-            // ) {
-            //     ui.aiStrategySelect.value =
-            //         game.aiStrategy;
-                
-            //     return;
-            // }
+        ui.aiStrategySelect.value =
+            game.aiStrategy;
 
-            ui.aiStrategySelect.value =
-                    game.aiStrategy;
+        game.aiStrategy =
+            strategy;
 
-            game.aiStrategy =
-                strategy;
+        game.ai =
+            AIRegistry.create(
+                strategy,
+                createAIConfig()
+            );
 
-            game.ai =
-                AIRegistry.create(
-                    strategy,
-                    createAIConfig()
-                );
+        game.ai.initialize();
 
-            game.ai.initialize();
-
-            if (
-                game.aiStrategy ===
-                "hamiltonian"
-            ) {
-                game.aiCycle =
-                    game.ai.getCycle();
-            } else {
-                game.aiCycle = [];
-            }
-
-            /*
-            * Clear previous AI decision.
-            */
-            game.aiDecision.nextDirection =
-                null;
-
-            game.aiDecision.cycleIndex =
-                null;
-
-            /*
-            * Reset the board using
-            * the newly selected AI.
-            */
-            resetGame();
-
-            /*
-            * Make sure the dropdown reflects
-            * the actual active strategy.
-            */
-            ui.aiStrategySelect.value =
-                game.aiStrategy;
-
-            updateUI();
-            render();
+        if (
+            game.aiStrategy ===
+            "hamiltonian"
+        ) {
+            game.aiCycle =
+                game.ai.getCycle();
+        } else {
+            game.aiCycle = [];
         }
+
+        /*
+        * Clear previous AI decision.
+        */
+        game.aiDecision.nextDirection =
+            null;
+
+        game.aiDecision.cycleIndex =
+            null;
+
+        /*
+        * Reset the board using
+        * the newly selected AI.
+        */
+        resetGame();
+
+        /*
+        * Make sure the dropdown reflects
+        * the actual active strategy.
+        */
+        ui.aiStrategySelect.value =
+            game.aiStrategy;
+
+        updateUI();
+        render();
+    }
     );
 
     window.addEventListener(
@@ -1740,9 +1742,9 @@
          * Create AI.
          */
         game.ai = AIRegistry.create(
-                    game.aiStrategy,
-                    createAIConfig()
-                );
+            game.aiStrategy,
+            createAIConfig()
+        );
 
         game.ai.initialize();
 

@@ -19,7 +19,7 @@
  * Unlike normal BFS, Safe BFS considers
  * what happens after reaching the food.
  */
-class SafeBFSAI {
+class SafeBFSAI extends AIInterface {
 
     constructor(config) {
 
@@ -28,8 +28,7 @@ class SafeBFSAI {
                 "Safe BFS AI requires a game configuration."
             );
         }
-
-        this.config = config;
+        super(config);
 
         this.width = 0;
         this.height = 0;
@@ -43,14 +42,7 @@ class SafeBFSAI {
     }
 
 
-    get snake() {
-        return this.config.snake;
-    }
 
-
-    get food() {
-        return this.config.food;
-    }
 
 
     initialize() {
@@ -1114,10 +1106,10 @@ class SafeBFSAI {
 
         if (
             Number.isInteger(
-                this.config.boardWidth
+                this.boardWidth
             )
         ) {
-            return this.config.boardWidth;
+            return this.boardWidth;
         }
 
 
@@ -1132,10 +1124,10 @@ class SafeBFSAI {
 
         if (
             Number.isInteger(
-                this.config.boardHeight
+                this.boardHeight
             )
         ) {
-            return this.config.boardHeight;
+            return this.boardHeight;
         }
 
 

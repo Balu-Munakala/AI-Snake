@@ -12,15 +12,14 @@
  * of number of grid cells when all moves have
  * equal cost.
  */
-class BFSAI {
+class BFSAI extends AIInterface {
     constructor(config) {
         if (!config) {
             throw new Error(
-                "BFS AI requires a game instance."
+                "BFS AI requires a configuration object."
             );
         }
-
-        this.config = config;
+        super(config);
 
         this.width = 0;
         this.height = 0;
@@ -33,13 +32,7 @@ class BFSAI {
         this.initialized = false;
     }
 
-    get snake() {
-        return this.config.snake;
-    }
 
-    get food() {
-        return this.config.food;
-    }
 
     /**
      * Initialize the AI.
@@ -438,10 +431,10 @@ class BFSAI {
     getBoardWidth() {
         if (
             Number.isInteger(
-                this.config.boardWidth
+                this.boardWidth
             )
         ) {
-            return this.config.boardWidth;
+            return this.boardWidth;
         }
 
         return 20;
@@ -453,10 +446,10 @@ class BFSAI {
     getBoardHeight() {
         if (
             Number.isInteger(
-                this.config.boardHeight
+                this.boardHeight
             )
         ) {
-            return this.config.boardHeight;
+            return this.boardHeight;
         }
 
         return 20;

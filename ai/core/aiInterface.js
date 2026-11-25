@@ -3,15 +3,17 @@
 class AIInterface {
 
     constructor(config = {}) {
+        this.config = config;
+        this.boardWidth = config.boardWidth ?? 20;
+        this.boardHeight = config.boardHeight ?? 20;
+    }
 
-        this.snake = config.snake;
-        this.food = config.food;
+    get snake() {
+        return this.config.snake;
+    }
 
-        this.boardWidth =
-            config.boardWidth ?? 20;
-
-        this.boardHeight =
-            config.boardHeight ?? 20;
+    get food() {
+        return this.config.food;
     }
 
 
